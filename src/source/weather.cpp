@@ -5,9 +5,11 @@ WiFiClient client;
 const char server[] = "api.openweathermap.org";
 String nameOfCity = "Malang,ID";
 
-String apiKey = "API KEY";
+String apiKey = "b32f13fa9998bc87e94738c7b9889bcf";
 
 String text;
+
+String* weatherData;
 
 int jsonend = 0;
 bool startJson = false;
@@ -54,14 +56,14 @@ String* fetchWeather(){
                 text += c;
             }
             if (jsonend == 0 && startJson){
-                String* weatherData = parseJson(text.c_str());
+                weatherData = parseJson(text.c_str());
                 text = "";
                 startJson = false;
                 fetchedStatus = true;
-                return weatherData;
+                break;
             }
         }
-        return nullptr;
+        return weatherData;
     } else { // client failed to connect
         Serial.println("connection failed");
         return nullptr;
