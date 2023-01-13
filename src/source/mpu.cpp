@@ -1,6 +1,6 @@
 #include "../include/mpu.h"
 Adafruit_MPU6050 mpu;
-EMailSender emailSend("AddYourMail@gmail.com", "password");
+EMailSender emailSend("yuniakennyar@gmail.com", "smanti2021");
 
 int detectionCounter = 0;
 int mpuThresh = 40;
@@ -105,10 +105,10 @@ bool jerkDetection()
 bool sendMail(int noOfWarning)
 {
     EMailSender::EMailMessage message;
-    message.subject = "He is cheating!";
+    message.subject = "He is Hancok!";
     message.message = "Warnings issued :" + String(noOfWarning) + "<br><br><br>SUS<br><br><br> Regards, <br>Your Faithful N-sfw";
 
-    EMailSender::Response resp = emailSend.send("reciverMail@gmail.com", message);
+    EMailSender::Response resp = emailSend.send("inimalika123@yahoo.com", message);
 
     return resp.status;
 }

@@ -14,18 +14,11 @@ int analogValue = 0;
 
 int displayBPM = 0;
 
+String* displayWeather;
+
 void setDisplayTime(String currentTime)
 {
     timenow = currentTime;
-}
-
-void setGraphingValue(int16_t x, int16_t y, int16_t lx, int16_t ly, int bpm)
-{
-    x_axis = x;
-    y_axis = y;
-    last_x_axis = lx;
-    last_y_axis = ly;
-    displayBPM = bpm;
 }
 
 void clock(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y)
@@ -36,29 +29,21 @@ void clock(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y
     display->drawString(64 + x, 10 + y, timenow);
 }
 
-void pulseRate(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y)
+void weatherCast(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y)
 {
 }
 
-void drawGraph()
-{
-    // The coordinates define the center of the text
-
-    display.drawLine(last_x_axis, last_y_axis, x_axis, y_axis);
-    if (x_axis > 127)
-    {
-        display.end();
+void drawWeather(){
+    if (displayWeather == 0){
+        displayWeather = fetchWeather();
     }
-    display.setColor(BLACK);
-    display.fillRect(27, 14, 75, 18);
-    display.setColor(WHITE);
     display.setFont(ArialMT_Plain_16);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 16, "BMP : " + String(displayBPM));
+    display.drawString(64, 16, String(displayWeather[0]) + " " + String(displayWeather[1]) + "\n" + String(displayWeather[2]));
     display.display();
 }
 
-FrameCallback frames[] = {clock, pulseRate};
+FrameCallback frames[] = {clock, weatherCast};
 
 // how many frames are there?
 int frameCount = 2;
@@ -97,7 +82,7 @@ int16_t remainingTimeBudget()
     }
     else
     {
-        drawGraph();
+        // show weather cast
         return -1;
     }
 }

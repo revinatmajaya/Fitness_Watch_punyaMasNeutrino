@@ -16,6 +16,7 @@ void setup()
     ;
   startTime();
   initUI();
+  initWeather();
   idleTime = millis();
 }
 
@@ -41,8 +42,7 @@ void loop()
       // WiFi.mode(WIFI_OFF);
     }
   }
-
-  calculateGraphics();
+  
   if (calculateMotion())
   {
     if (!displayOnStatus)
