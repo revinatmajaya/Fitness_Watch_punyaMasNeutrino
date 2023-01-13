@@ -1,5 +1,6 @@
 #include "SSD1306Wire.h"
 #include "OLEDDisplayUi.h"
+#include "weather.h"
 
 void initDispaly();
 
@@ -22,3 +23,5 @@ void onDispaly();
 void turnOffDisplay();
 
 void setGraphingValue(int16_t x, int16_t y, int16_t lx, int16_t ly, int bpm);
+
+void drawWeather();
