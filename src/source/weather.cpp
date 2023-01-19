@@ -92,7 +92,6 @@ String** fetchWeather(){
             }
             if (jsonend == 0 && startJson){
                 parseJson(text.c_str());
-                Serial.println(text);
                 text = "";
                 startJson = false;
                 fetchedStatus = true;
