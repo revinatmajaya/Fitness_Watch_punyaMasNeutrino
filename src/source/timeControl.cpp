@@ -2,7 +2,7 @@
 
 // NTP Servers:
 static const char ntpServerName[] = "us.pool.ntp.org";
-const int timeZone = 19800; // IST
+const int timeZone = 25200; // GMT+7
 WiFiUDP Udp;
 unsigned int localPort = 8888; // local port to listen for UDP packets
 
