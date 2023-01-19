@@ -1,32 +1,63 @@
+/*
+⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⠄⠄⠄⠄⠄⣀⣀⣐⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⢠⠄⣠⣶⣿⣿⣿⠿⠿⣛⣂⣀⣀⡒⠶⣶⣤⣤⣬⣀⡀⠄⢀⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⢀⣾⣿⣿⣿⡟⢡⢾⣿⣿⣿⣿⣿⣿⣶⣌⠻⣿⣿⣿⣿⣷⣦⣄⡀⠄⠄⠄⠄⠄
+⠄⠄⣈⣉⡛⣿⣿⣿⡌⢇⢻⣿⣿⣿⣿⣿⠿⠛⣡⣿⣿⣿⣿⣿⣿⣿⣿⣦⣄⠄⠄⠄
+⠄⠺⠟⣉⣴⡿⠛⣩⣾⣎⠳⠿⠛⣋⣩⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠄⠄
+⠄⠄⠄⠘⢋⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄
+⠄⠄⢀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠄
+⠄⠄⠄⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⣀
+⠄⠄⠄⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠘⠛
+⠄⠄⠄⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⣀⣀⣠⣤
+⠄⠄⣀⣀⡙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢛⣩⠤⠾⠄⠛⠋⠉⢉
+⠄⠺⠿⠛⠛⠃⠄⠉⠙⠛⠛⠻⠿⠿⠿⠟⠛⠛⠛⠉⠁⠄⠄⣀⣀⣠⣤⣠⣴⣶⣼⣿
+
+weather.cpp
+=============
+this code will fetch weather datas from OpenWeatherMap API. 
+The data format will be on JSON and the structure is defined by the API.
+==========================================================================
+code collaborator: revin atmajaya, brodiono
+Started in the beginning of January 2023 and will end when it has to be ended.
+*/
+
 #include "../include/weather.h"
 
 WiFiClient client;
 
 const char server[] = "api.openweathermap.org";
-String nameOfCity = "Malang,ID";
+String nameOfCity = "Bandung,ID";
 
-String apiKey = "b32f13fa9998bc87e94738c7b9889bcf";
+String apiKey = "[your api key]";
 
 String text;
 
-String* weatherData;
+String weatherDesc = "";
+String weatherTemp = "";
+String weatherCity = "";
+
+String* weatherData[3] = {&weatherDesc, &weatherTemp, &weatherCity};
 
 int jsonend = 0;
 bool startJson = false;
 // int status = WL_IDLE_STATUS;
-int fetchedStatus = false;
+bool fetchedStatus = false;
 
 void initWeather(){
     text.reserve(JSON_BUFF_DIMENSION);
 }
 
-String* fetchWeather(){
+String** fetchWeather(){
     client.stop();
+    weatherDesc = "null";
+    weatherTemp = "0";
+    weatherCity = "null";
     if (client.connect(server, 80)){
         // client succesfully connected to server
         // send HTTP PUT request
         Serial.println("client connected");
-        client.println("GET /data/2.5/forecast?q=" + nameOfCity + "&appid=" + apiKey + "&mode=json&units=metric&cnt=2 HTTP/1.1");
+        client.println("GET /data/2.5/weather?q=" + nameOfCity + "&appid=" + apiKey + "&mode=json&units=metric&cnt=2 HTTP/1.1");
         client.println("Host: api.openweathermap.org");
         client.println("User-Agent: ArduinoWiFi/1.1");
         client.println("Connection: close");
@@ -37,13 +68,17 @@ String* fetchWeather(){
             if (millis() - timeout > 5000){
                 Serial.println("client timeout");
                 client.stop();
-                return nullptr;
+                weatherDesc = "timeout";
+                weatherTemp = "0";
+                weatherCity = "timeout";
+                return weatherData;
             }
         }
 
         char c = 0;
-        while (client.available()){
+        while (client.available() && !fetchedStatus){
             c = client.read();
+            Serial.println(c);
 
             if (c == '{'){
                 startJson = true;
@@ -56,21 +91,27 @@ String* fetchWeather(){
                 text += c;
             }
             if (jsonend == 0 && startJson){
-                weatherData = parseJson(text.c_str());
+                parseJson(text.c_str());
+                Serial.println(text);
                 text = "";
                 startJson = false;
                 fetchedStatus = true;
-                break;
             }
         }
+
         return weatherData;
+
     } else { // client failed to connect
         Serial.println("connection failed");
-        return nullptr;
+        delay(100);
+        weatherDesc = "failcon";
+        weatherTemp = "0";
+        weatherCity = "failcon";
+        return weatherData;
     }
 }
 
-String* parseJson(const char* jsonString){
+void parseJson(const char* jsonString){
     const size_t bufferSize = 2*JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(2) + 4*JSON_OBJECT_SIZE(1) + 3*JSON_OBJECT_SIZE(2) + 3*JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(5) + 2*JSON_OBJECT_SIZE(7) + 2*JSON_OBJECT_SIZE(8) + 720;
     DynamicJsonBuffer jsonBuffer(bufferSize);
 
@@ -78,21 +119,16 @@ String* parseJson(const char* jsonString){
     JsonObject& root = jsonBuffer.parseObject(jsonString);
     if (!root.success()) {
         Serial.println("parseObject() failed");
-        return nullptr;
+        weatherDesc = "failparse";
+    } else {
+        int temp = root["main"]["temp"];
+
+        const String description = root["weather"][0]["main"];
+        const String temperature = String(temp);
+        const String city =  root["name"];
+
+        weatherDesc = description;
+        weatherTemp = temperature;
+        weatherCity = city;
     }
-
-    JsonArray& list = root["list"];
-    JsonObject& nowData = list[0];
-
-    int temp = nowData["main"]["temp"];
-
-    const String weatherID = nowData["weather"][0]["main"];
-    const String temperature = String(temp);
-    const String city =  root["city"]["name"];
-    static String weatherData[3] = {weatherID, temperature, city};
-    Serial.println(weatherData[0]);
-    Serial.println(weatherData[1]);
-    Serial.println(weatherData[2]);
-
-    return weatherData;
 }

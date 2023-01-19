@@ -11,7 +11,7 @@ void setup()
   startWiFiManager();
   initDispaly();
   delay(100);
-  setupMPU();
+  // setupMPU();
   while (wifiConnected())
     ;
   startTime();
@@ -43,21 +43,21 @@ void loop()
     }
   }
   
-  if (calculateMotion())
-  {
-    if (!displayOnStatus)
-    {
-      onDispaly();
-      displayOnStatus = true;
-    }
-    idleTime = millis();
-  }
-  else if (!calculateMotion() && displayOnStatus && millis() - idleTime > 15000)
-  {
-    displayOnStatus = false;
-    turnOffDisplay();
-    idleTime = millis();
-  }
+  // if (calculateMotion())
+  // {
+  //   if (!displayOnStatus)
+  //   {
+  //     onDispaly();
+  //     displayOnStatus = true;
+  //   }
+  //   idleTime = millis();
+  // }
+  // else if (!calculateMotion() && displayOnStatus && millis() - idleTime > 15000)
+  // {
+  //   displayOnStatus = false;
+  //   turnOffDisplay();
+  //   idleTime = millis();
+  // }
 
   // put your main code here, to run repeatedly:
 }

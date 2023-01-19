@@ -5,5 +5,5 @@
 #define JSON_BUFF_DIMENSION 2500
 
 void initWeather();
-String* fetchWeather();
-String* parseJson(const char* jsonString);
+String** fetchWeather();
+void parseJson(const char* jsonString);

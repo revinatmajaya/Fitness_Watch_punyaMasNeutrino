@@ -14,7 +14,7 @@ int analogValue = 0;
 
 int displayBPM = 0;
 
-String* displayWeather;
+String** displayWeather = nullptr;
 
 void setDisplayTime(String currentTime)
 {
@@ -31,16 +31,26 @@ void clock(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y
 
 void weatherCast(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y)
 {
+    // if (displayWeather == nullptr){
+    //     displayWeather = fetchWeather();
+    // }
+    // display->setFont(ArialMT_Plain_16);
+    // display->setTextAlignment(TEXT_ALIGN_CENTER);
+    // display->drawString(64 + x, y, *displayWeather[0] + ", " + *displayWeather[1] + "°C");
+    // display->setFont(ArialMT_Plain_10);
+    // display->drawString(64 + x, y+16, *displayWeather[2]);
 }
 
 void drawWeather(){
-    if (displayWeather == 0){
+    if (displayWeather == nullptr){
         displayWeather = fetchWeather();
     }
     display.setFont(ArialMT_Plain_16);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
     // display.drawString(64, 10, "im here");
-    display.drawString(64, 10, displayWeather[1]);
+    display.drawString(64, 0, *displayWeather[0] + ", " + *displayWeather[1] + "°C");
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(64, 16, *displayWeather[2]);
     display.display();
 }
 
